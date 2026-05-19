@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام متابعة حالة المريض الذكي</title>
+    <style>
+        /* نظام الألوان: أزرق ورمادي */
+        :root {
+            --primary-blue: #2b5876;
+            --light-blue: #4e4376;
+            --bg-gray: #f4f6f9;
+            --card-gray: #ffffff;
+            --text-dark: #333333;
+            --text-muted: #6c757d;
+            --accent-blue: #007bff;
+            --danger-red: #dc3545;
+            --success-green: #28a745;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-gray);
+            color: var(--text-dark);
+            padding-bottom: 60px;
+        }
+
+        /* الهيدر */
+        header {
+            background: linear-gradient(135deg, var(--primary-blue), #4a779d);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* الحاوية الرئيسية */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: 1fr 1fr;
+            }
+            .full-width {
+                grid-column: span 2;
+            }
+        }
+
+        /* الكروت والبطاقات */
+        .card {
+            background-color: var(--card-gray);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 20px;
+            border-top: 4px solid var(--primary-blue);
+        }
+
+        .card h2 {
+            font-size: 18px;
+            color: var(--primary-blue);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+
+        /* الاستمارات (Forms) */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 14px;
+            background-color: #fafafa;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            background-color: #fff;
+        }
+
+        .btn {
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            width: 100%;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #1e3f56;
+        }
+
+        /* الجداول والقوائم */
+        .list-container {
+            max-height: 250px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #edf2f7;
+            background-color: #f8f9fa;
+            margin-bottom: 8px;
+            border-radius: 5px;
+        }
+
+        .item-details h4 {
+            font-size: 15px;
+            color: var(--text-dark);
+        }
+
+        .item-details p {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .btn-delete {
+            background-color: var(--danger-red);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-delete:hover {
+            background-color: #b21f2d;
+        }
+
+        /* لوحة الحالة الصحية السريعة */
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .status-box {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+        }
+
+        .status-box span {
+            display: block;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        .status-box strong {
+            font-size: 16px;
+            color: var(--primary-blue);
+        }
+
+        /* نظام الإشعارات المنبثقة داخل التطبيق */
+        .alert-banner {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- الهيدر الرئيسي -->
+    <header>
+        <h1>نظام رعاية ومتابعة المريض الذكي</h1>
+        <p>مراقبة الحالة الصحية، منبه الأدوية، ومواعيد الأطباء المباشرة</p>
+    </header>
+
+    <div class="container">
+
+        <!-- راية التنبيهات النشطة -->
+        <div id="alertBanner" class="full-width alert-banner">
+            <strong>تنبيه نشط:</strong> <span id="alertMessage">حان الآن موعد أخذ الدواء!</span>
+        </div>
+
+        <!-- كرت ملخص الحالة الصحية الحالي للمريض -->
+        <div class="card full-width">
+            <h2>📊 الملخص الصحي الحالي للمريض</h2>
+            <div class="status-grid">
+                <div class="status-box">
+                    <span>حالة المريض العامة</span>
+                    <strong id="lblStatus">مستقرة</strong>
+                </div>
+                <div class="status-box">
+                    <span>الأدوية المجدولة اليوم</span>
+                    <strong id="lblMedCount">0 أدوية</strong>
+                </div>
+                <div class="status-box">
+                    <span>المواعيد القادمة</span>
+                    <strong id="lblApptCount">0 مواعيد</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- كرت إضافة الدواء والمنبه -->
+        <div class="card">
+            <h2>💊 إضافة دواء جديد ومنبه للجرعة</h2>
+            <form id="medForm" onsubmit="addMedicine(event)">
+                <div class="form-group">
+                    <label>اسم العلاج / الدواء:</label>
+                    <input type="text" id="medName" class="form-control" placeholder="مثال: بنادول، مضاد حيوي..." required>
+                </div>
+                <div class="form-group">
+                    <label>الجرعة المتناولة:</label>
+                    <input type="text" id="medDose" class="form-control" placeholder="مثال: حبة واحدة، 5 مل..." required>
+                </div>
+                <div class="form-group">
+                    <label>وقت التنبيه وأخذ الدواء:</label>
+                    <input type="time" id="medTime" class="form-control" required>
+                </div>
+                <button type="submit" class="btn">حفظ الدواء وتفعيل المنبه</button>
+            </form>
+
+            <h3 style="margin-top: 20px; font-size: 15px; color: var(--primary-blue);">📋 قائمة الأدوية الحالية</h3>
+            <div class="list-container" id="medicineList">
+                <!-- الأدوية المضافة تظهر هنا -->
+            </div>
+        </div>
+
+        <!-- كرت إضافة موعد الطبيب والمنبه -->
+        <div class="card">
+            <h2>📅 جدولة موعد مقابلة الطبيب</h2>
+            <form id="apptForm" onsubmit="addAppointment(event)">
+                <div class="form-group">
+                    <label>اسم الطبيب / العيادة:</label>
+                    <input type="text" id="doctorName" class="form-control" placeholder="مثال: د. أحمد - عيادة القلب" required>
+                </div>
+                <div class="form-group">
+                    <label>تاريخ الموعد:</label>
+                    <input type="date" id="apptDate" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>وقت الموعد الموعود:</label>
+                    <input type="time" id="apptTime" class="form-control" required>
+                </div>
+                <button type="submit" class="btn">جدولة الموعد وتفعيل التذكير</button>
+            </form>
+
+            <h3 style="margin-top: 20px; font-size: 15px; color: var(--primary-blue);">📋 مواعيد الأطباء القادمة</h3>
+            <div class="list-container" id="appointmentList">
+                <!-- المواعيد المضافة تظهر هنا -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- كود التشغيل والتحكم الذكي والمنبهات -->
+    <script>
+        // مصفوفات حفظ البيانات محلياً في المتصفح لتجنب المسح عند إعادة التحميل
+        let medicines = JSON.parse(localStorage.getItem('medicines')) || [];
+        let appointments = JSON.parse(localStorage.getItem('appointments')) || [];
+
+        // تشغيل نظام التحديث عند فتح الصفحة فوراً
+        document.addEventListener("DOMContentLoaded", () => {
+            renderMedicines();
+            renderAppointments();
+            updateDashboard();
+            
+            // بدء فحص المواعيد الذكي كل دقيقة لتشغيل المنبه الصوتى والإشعارات
+            setInterval(checkAlarms, 30000); // فحص كل 30 ثانية لدقة أعلى
+        });
+
+        // تحديث أرقام لوحة التحكم العليا
+        function updateDashboard() {
+            document.getElementById('lblMedCount').innerText = `${medicines.length} أدوية`;
+            document.getElementById('lblApptCount').innerText = `${appointments.length} مواعيد`;
+            document.getElementById('lblStatus').innerText = medicines.length > 0 ? "تحت الرعاية" : "مستقرة";
+        }
+
+        // إضافة دواء جديد
+        function addMedicine(e) {
+            e.preventDefault();
+            const name = document.getElementById('medName').value;
+            const dose = document.getElementById('medDose').value;
+            const time = document.getElementById('medTime').value;
+
+            const newMed = { id: Date.now(), name, dose, time, triggered: false };
+            medicines.push(newMed);
+            localStorage.setItem('medicines', JSON.stringify(medicines));
+            
+            renderMedicines();
+            updateDashboard();
+            document.getElementById('medForm').reset();
+        }
+
+        // عرض قائمة الأدوية في الواجهة
+        function renderMedicines() {
+            const list = document.getElementById('medicineList');
+            list.innerHTML = '';
+
+            if(medicines.length === 0) {
+                list.innerHTML = '<p style="color:var(--text-muted); font-size:13px; text-align:center; padding:10px;">لا يوجد أدوية مضافة حالياً.</p>';
+                return;
+            }
+
+            medicines.forEach(med => {
+                list.innerHTML += `
+                    <div class="item-row">
+                        <div class="item-details">
+                            <h4>💊 ${med.name}</h4>
+                            <p>الجرعة: ${med.dose} | ⏰ الوقت: ${med.time}</p>
+                        </div>
+                        <button class="btn-delete" onclick="deleteMedicine(${med.id})">حذف</button>
+                    </div>
+                `;
+            });
+        }
+
+        // حذف دواء
+        function deleteMedicine(id) {
+            medicines = medicines.filter(m => m.id !== id);
+            localStorage.setItem('medicines', JSON.stringify(medicines));
+            renderMedicines();
+            updateDashboard();
+        }
+
+        // إضافة موعد طبيب جديد
+        function addAppointment(e) {
+            e.preventDefault();
+            const doctor = document.getElementById('doctorName').value;
+            const date = document.getElementById('apptDate').value;
+            const time = document.getElementById('apptTime').value;
+
+            const newAppt = { id: Date.now(), doctor, date, time, triggered: false };
+            appointments.push(newAppt);
+            localStorage.setItem('appointments', JSON.stringify(appointments));
+
+            renderAppointments();
+            updateDashboard();
+            document.getElementById('apptForm').reset();
+        }
+
+        // عرض قائمة المواعيد في الواجهة
+        function renderAppointments() {
+            const list = document.getElementById('appointmentList');
+            list.innerHTML = '';
+
+            if(appointments.length === 0) {
+                list.innerHTML = '<p style="color:var(--text-muted); font-size:13px; text-align:center; padding:10px;">لا توجد مواعيد مجدولة حالياً.</p>';
+                return;
+            }
+
+            appointments.forEach(appt => {
+                list.innerHTML += `
+                    <div class="item-row">
+                        <div class="item-details">
+                            <h4>👨‍⚕️ ${appt.doctor}</h4>
+                            <p>📅 التاريخ: ${appt.date} | ⏰ الوقت: ${appt.time}</p>
+                        </div>
+                        <button class="btn-delete" onclick="deleteAppointment(${appt.id})">حذف</button>
+                    </div>
+                `;
+            });
+        }
+
+        // حذف موعد
+        function deleteAppointment(id) {
+            appointments = appointments.filter(a => a.id !== id);
+            localStorage.setItem('appointments', JSON.stringify(appointments));
+            renderAppointments();
+            updateDashboard();
+        }
+
+        // محرك فحص المنبهات والتذكير التلقائي
+        function checkAlarms() {
+            const now = new Date();
+            // الحصول على الوقت الحالي بصيغة HH:MM
+            const currentHours = String(now.getHours()).padStart(2, '0');
+            const currentMinutes = String(now.getMinutes()).padStart(2, '0');
+            const currentTimeStr = `${currentHours}:${currentMinutes}`;
+            
+            // الحصول على تاريخ اليوم بصيغة YYYY-MM-DD
+            const currentYear = now.getFullYear();
+            const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
+            const currentDay = String(now.getDate()).padStart(2, '0');
+            const currentDateStr = `${currentYear}-${currentMonth}-${currentDay}`;
+
+            // 1. فحص منبهات الأدوية
+            medicines.forEach(med => {
+                if (med.time === currentTimeStr && !med.triggered) {
+                    triggerAlarm(`⏰ حان الآن موعد جرعة الدواء: (${med.name}) - الجرعة: [${med.dose}]`);
+                    med.triggered = true; // منع تكرار التنبيه في نفس الدقيقة
+                } else if (med.time !== currentTimeStr) {
+                    med.triggered = false; // إعادة التصفير للدورة القادمة
+                }
+            });
+
+            // 2. فحص منبهات مواعيد الأطباء
+            appointments.forEach(appt => {
+                if (appt.date === currentDateStr && appt.time === currentTimeStr && !appt.triggered) {
+                    triggerAlarm(`👨‍⚕️ تذكير بموعد الطبيب الآن: الموعد الحالي مع (${appt.doctor})`);
+                    appt.triggered = true;
+                } else if (appt.time !== currentTimeStr) {
+                    appt.triggered = false;
+                }
+            });
+        }
+
+        // إطلاق التنبيه الصوتي والمرئي
+        function triggerAlarm(message) {
+            // إظهار راية التنبيه في أعلى الموقع
+            const banner = document.getElementById('alertBanner');
+            document.getElementById('alertMessage').innerText = message;
+            banner.style.display = 'block';
+
+            // إطلاق تنبيه بالنظام الافتراضي للمتصفح (Alert) لضمان انتباه المستخدم
+            alert(message);
+
+            // تشغيل نغمة صوتية إلكترونية عبر كرت الصوت الداخلي للمتصفح مباشرة دون الحاجة لملفات خارجية
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                oscillator.type = 'sine'; 
+                oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // تردد النغمة (صوت تنبيه حاد)
+                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                
+                oscillator.start();
+                // إيقاف الصوت بعد ثانيتين
+                setTimeout(() => {
+                    oscillator.stop();
+                    banner.style.display = 'none'; // إخفاء الراية بعد انتهاء الصوت
+                }, 2000);
+            } catch (e) {
+                console.log("المنبه الصوتي مدعوم بعد تفاعل المستخدم مع الصفحة أولاً.");
+            }
+        }
+    </script>
+</body>
+</html>
