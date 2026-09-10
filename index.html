@@ -31,6 +31,48 @@
             padding-bottom: 60px;
         }
 
+        /* شاشة تسجيل الدخول */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-gray);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .login-card {
+            background-color: var(--card-gray);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+            border-top: 5px solid var(--primary-blue);
+            text-align: center;
+        }
+
+        .login-card h2 {
+            color: var(--primary-blue);
+            margin-bottom: 10px;
+            font-size: 22px;
+        }
+
+        .login-card p {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-bottom: 25px;
+        }
+
+        .login-card .form-group {
+            text-align: right;
+        }
+
         /* الهيدر */
         header {
             background: linear-gradient(135deg, var(--primary-blue), #4a779d);
@@ -39,6 +81,7 @@
             text-align: center;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             margin-bottom: 30px;
+            position: relative;
         }
 
         header h1 {
@@ -49,6 +92,25 @@
         header p {
             font-size: 14px;
             opacity: 0.9;
+        }
+
+        .btn-logout {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid white;
+            padding: 6px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+
+        .btn-logout:hover {
+            background-color: var(--danger-red);
+            border-color: var(--danger-red);
         }
 
         /* الحاوية الرئيسية */
@@ -226,105 +288,155 @@
 </head>
 <body>
 
-    <!-- الهيدر الرئيسي -->
-    <header>
-        <h1>نظام رعاية ومتابعة المريض الذكي</h1>
-        <p>مراقبة الحالة الصحية، منبه الأدوية، ومواعيد الأطباء المباشرة</p>
-    </header>
-
-    <div class="container">
-
-        <!-- راية التنبيهات النشطة -->
-        <div id="alertBanner" class="full-width alert-banner">
-            <strong>تنبيه نشط:</strong> <span id="alertMessage">حان الآن موعد أخذ الدواء!</span>
-        </div>
-
-        <!-- كرت ملخص الحالة الصحية الحالي للمريض -->
-        <div class="card full-width">
-            <h2>📊 الملخص الصحي الحالي للمريض</h2>
-            <div class="status-grid">
-                <div class="status-box">
-                    <span>حالة المريض العامة</span>
-                    <strong id="lblStatus">مستقرة</strong>
-                </div>
-                <div class="status-box">
-                    <span>الأدوية المجدولة اليوم</span>
-                    <strong id="lblMedCount">0 أدوية</strong>
-                </div>
-                <div class="status-box">
-                    <span>المواعيد القادمة</span>
-                    <strong id="lblApptCount">0 مواعيد</strong>
-                </div>
-            </div>
-        </div>
-
-        <!-- كرت إضافة الدواء والمنبه -->
-        <div class="card">
-            <h2>💊 إضافة دواء جديد ومنبه للجرعة</h2>
-            <form id="medForm" onsubmit="addMedicine(event)">
+    <!-- شاشة تسجيل الدخول -->
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-card">
+            <h2>تسجيل الدخول</h2>
+            <p>أدخل بيانات الحساب للوصول إلى نظام متابعة المريض</p>
+            <form id="loginForm" onsubmit="handleLogin(event)">
                 <div class="form-group">
-                    <label>اسم العلاج / الدواء:</label>
-                    <input type="text" id="medName" class="form-control" placeholder="مثال: بنادول، مضاد حيوي..." required>
+                    <label>اسم المستخدم / البريد الإلكتروني:</label>
+                    <input type="text" id="username" class="form-control" placeholder="أدخل اسم المستخدم" required>
                 </div>
                 <div class="form-group">
-                    <label>الجرعة المتناولة:</label>
-                    <input type="text" id="medDose" class="form-control" placeholder="مثال: حبة واحدة، 5 مل..." required>
+                    <label>كلمة المرور:</label>
+                    <input type="password" id="password" class="form-control" placeholder="أدخل كلمة المرور" required>
                 </div>
-                <div class="form-group">
-                    <label>وقت التنبيه وأخذ الدواء:</label>
-                    <input type="time" id="medTime" class="form-control" required>
-                </div>
-                <button type="submit" class="btn">حفظ الدواء وتفعيل المنبه</button>
+                <button type="submit" class="btn">دخول للنظام</button>
             </form>
-
-            <h3 style="margin-top: 20px; font-size: 15px; color: var(--primary-blue);">📋 قائمة الأدوية الحالية</h3>
-            <div class="list-container" id="medicineList">
-                <!-- الأدوية المضافة تظهر هنا -->
-            </div>
         </div>
+    </div>
 
-        <!-- كرت إضافة موعد الطبيب والمنبه -->
-        <div class="card">
-            <h2>📅 جدولة موعد مقابلة الطبيب</h2>
-            <form id="apptForm" onsubmit="addAppointment(event)">
-                <div class="form-group">
-                    <label>اسم الطبيب / العيادة:</label>
-                    <input type="text" id="doctorName" class="form-control" placeholder="مثال: د. أحمد - عيادة القلب" required>
-                </div>
-                <div class="form-group">
-                    <label>تاريخ الموعد:</label>
-                    <input type="date" id="apptDate" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>وقت الموعد الموعود:</label>
-                    <input type="time" id="apptTime" class="form-control" required>
-                </div>
-                <button type="submit" class="btn">جدولة الموعد وتفعيل التذكير</button>
-            </form>
+    <!-- محتوى الموقع الرئيسي -->
+    <div id="mainContent" style="display: none;">
+        <!-- الهيدر الرئيسي -->
+        <header>
+            <button class="btn-logout" onclick="handleLogout()">تسجيل الخروج</button>
+            <h1>نظام رعاية ومتابعة المريض الذكي</h1>
+            <p>مراقبة الحالة الصحية، منبه الأدوية، ومواعيد الأطباء المباشرة</p>
+        </header>
 
-            <h3 style="margin-top: 20px; font-size: 15px; color: var(--primary-blue);">📋 مواعيد الأطباء القادمة</h3>
-            <div class="list-container" id="appointmentList">
-                <!-- المواعيد المضافة تظهر هنا -->
+        <div class="container">
+
+            <!-- راية التنبيهات النشطة -->
+            <div id="alertBanner" class="full-width alert-banner">
+                <strong>تنبيه نشط:</strong> <span id="alertMessage">حان الآن موعد أخذ الدواء!</span>
             </div>
-        </div>
 
+            <!-- كرت ملخص الحالة الصحية الحالي للمريض -->
+            <div class="card full-width">
+                <h2>📊 الملخص الصحي الحالي للمريض</h2>
+                <div class="status-grid">
+                    <div class="status-box">
+                        <span>حالة المريض العامة</span>
+                        <strong id="lblStatus">مستقرة</strong>
+                    </div>
+                    <div class="status-box">
+                        <span>الأدوية المجدولة اليوم</span>
+                        <strong id="lblMedCount">0 أدوية</strong>
+                    </div>
+                    <div class="status-box">
+                        <span>المواعيد القادمة</span>
+                        <strong id="lblApptCount">0 مواعيد</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- كرت إضافة الدواء والمنبه -->
+            <div class="card">
+                <h2>💊 إضافة دواء جديد ومنبه للجرعة</h2>
+                <form id="medForm" onsubmit="addMedicine(event)">
+                    <div class="form-group">
+                        <label>اسم العلاج / الدواء:</label>
+                        <input type="text" id="medName" class="form-control" placeholder="مثال: بنادول، مضاد حيوي..." required>
+                    </div>
+                    <div class="form-group">
+                        <label>الجرعة المتناولة:</label>
+                        <input type="text" id="medDose" class="form-control" placeholder="مثال: حبة واحدة، 5 مل..." required>
+                    </div>
+                    <div class="form-group">
+                        <label>وقت التنبيه وأخذ الدواء:</label>
+                        <input type="time" id="medTime" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn">حفظ الدواء وتفعيل المنبه</button>
+                </form>
+
+                <h3 style="margin-top: 20px; font-size: 15px; color: var(--primary-blue);">📋 قائمة الأدوية الحالية</h3>
+                <div class="list-container" id="medicineList">
+                    <!-- الأدوية المضافة تظهر هنا -->
+                </div>
+            </div>
+
+            <!-- كرت إضافة موعد الطبيب والمنبه -->
+            <div class="card">
+                <h2>📅 جدولة موعد مقابلة الطبيب</h2>
+                <form id="apptForm" onsubmit="addAppointment(event)">
+                    <div class="form-group">
+                        <label>اسم الطبيب / العيادة:</label>
+                        <input type="text" id="doctorName" class="form-control" placeholder="مثال: د. أحمد - عيادة القلب" required>
+                    </div>
+                    <div class="form-group">
+                        <label>تاريخ الموعد:</label>
+                        <input type="date" id="apptDate" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>وقت الموعد الموعود:</label>
+                        <input type="time" id="apptTime" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn">جدولة الموعد وتفعيل التذكير</button>
+                </form>
+
+                <h3 style="margin-top: 20px; font-size: 15px; color: var(--primary-blue);">📋 مواعيد الأطباء القادمة</h3>
+                <div class="list-container" id="appointmentList">
+                    <!-- المواعيد المضافة تظهر هنا -->
+                </div>
+            </div>
+
+        </div>
     </div>
 
     <!-- كود التشغيل والتحكم الذكي والمنبهات -->
     <script>
-        // مصفوفات حفظ البيانات محلياً في المتصفح لتجنب المسح عند إعادة التحميل
+        // مصفوفات حفظ البيانات محلياً في المتصفح
         let medicines = JSON.parse(localStorage.getItem('medicines')) || [];
         let appointments = JSON.parse(localStorage.getItem('appointments')) || [];
 
-        // تشغيل نظام التحديث عند فتح الصفحة فوراً
+        // تشغيل نظام التحديث وفحص تسجيل الدخول
         document.addEventListener("DOMContentLoaded", () => {
+            checkAuth();
             renderMedicines();
             renderAppointments();
             updateDashboard();
             
-            // بدء فحص المواعيد الذكي كل دقيقة لتشغيل المنبه الصوتى والإشعارات
-            setInterval(checkAlarms, 30000); // فحص كل 30 ثانية لدقة أعلى
+            // بدء فحص المواعيد الذكي كل 30 ثانية
+            setInterval(checkAlarms, 30000);
         });
+
+        // التحقق من حالة تسجيل الدخول
+        function checkAuth() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            if (isLoggedIn === 'true') {
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+            } else {
+                document.getElementById('loginOverlay').style.display = 'flex';
+                document.getElementById('mainContent').style.display = 'none';
+            }
+        }
+
+        // معالجة تسجيل الدخول
+        function handleLogin(e) {
+            e.preventDefault();
+            localStorage.setItem('isLoggedIn', 'true');
+            checkAuth();
+            document.getElementById('loginForm').reset();
+        }
+
+        // تسجيل الخروج
+        function handleLogout() {
+            localStorage.removeItem('isLoggedIn');
+            checkAuth();
+        }
 
         // تحديث أرقام لوحة التحكم العليا
         function updateDashboard() {
@@ -430,12 +542,10 @@
         // محرك فحص المنبهات والتذكير التلقائي
         function checkAlarms() {
             const now = new Date();
-            // الحصول على الوقت الحالي بصيغة HH:MM
             const currentHours = String(now.getHours()).padStart(2, '0');
             const currentMinutes = String(now.getMinutes()).padStart(2, '0');
             const currentTimeStr = `${currentHours}:${currentMinutes}`;
             
-            // الحصول على تاريخ اليوم بصيغة YYYY-MM-DD
             const currentYear = now.getFullYear();
             const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
             const currentDay = String(now.getDate()).padStart(2, '0');
@@ -445,9 +555,9 @@
             medicines.forEach(med => {
                 if (med.time === currentTimeStr && !med.triggered) {
                     triggerAlarm(`⏰ حان الآن موعد جرعة الدواء: (${med.name}) - الجرعة: [${med.dose}]`);
-                    med.triggered = true; // منع تكرار التنبيه في نفس الدقيقة
+                    med.triggered = true;
                 } else if (med.time !== currentTimeStr) {
-                    med.triggered = false; // إعادة التصفير للدورة القادمة
+                    med.triggered = false;
                 }
             });
 
@@ -464,15 +574,12 @@
 
         // إطلاق التنبيه الصوتي والمرئي
         function triggerAlarm(message) {
-            // إظهار راية التنبيه في أعلى الموقع
             const banner = document.getElementById('alertBanner');
             document.getElementById('alertMessage').innerText = message;
             banner.style.display = 'block';
 
-            // إطلاق تنبيه بالنظام الافتراضي للمتصفح (Alert) لضمان انتباه المستخدم
             alert(message);
 
-            // تشغيل نغمة صوتية إلكترونية عبر كرت الصوت الداخلي للمتصفح مباشرة دون الحاجة لملفات خارجية
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 const oscillator = audioCtx.createOscillator();
@@ -482,14 +589,13 @@
                 gainNode.connect(audioCtx.destination);
                 
                 oscillator.type = 'sine'; 
-                oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // تردد النغمة (صوت تنبيه حاد)
+                oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
                 gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
                 
                 oscillator.start();
-                // إيقاف الصوت بعد ثانيتين
                 setTimeout(() => {
                     oscillator.stop();
-                    banner.style.display = 'none'; // إخفاء الراية بعد انتهاء الصوت
+                    banner.style.display = 'none';
                 }, 2000);
             } catch (e) {
                 console.log("المنبه الصوتي مدعوم بعد تفاعل المستخدم مع الصفحة أولاً.");
