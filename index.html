@@ -73,6 +73,17 @@
             text-align: right;
         }
 
+        .error-message {
+            color: var(--danger-red);
+            font-size: 13px;
+            margin-bottom: 15px;
+            display: none;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 8px;
+            border-radius: 5px;
+        }
+
         /* الهيدر */
         header {
             background: linear-gradient(135deg, var(--primary-blue), #4a779d);
@@ -293,6 +304,7 @@
         <div class="login-card">
             <h2>تسجيل الدخول</h2>
             <p>أدخل بيانات الحساب للوصول إلى نظام متابعة المريض</p>
+            <div id="loginError" class="error-message">اسم المستخدم أو كلمة المرور غير صحيحة!</div>
             <form id="loginForm" onsubmit="handleLogin(event)">
                 <div class="form-group">
                     <label>اسم المستخدم / البريد الإلكتروني:</label>
@@ -424,12 +436,22 @@
             }
         }
 
-        // معالجة تسجيل الدخول
+        // معالجة تسجيل الدخول المحسّنة
         function handleLogin(e) {
             e.preventDefault();
-            localStorage.setItem('isLoggedIn', 'true');
-            checkAuth();
-            document.getElementById('loginForm').reset();
+            const usernameInput = document.getElementById('username').value.trim();
+            const passwordInput = document.getElementById('password').value.trim();
+            const errorElement = document.getElementById('loginError');
+
+            // التحقق من المطابقة (ADMIN و 123456)
+            if (usernameInput === 'ADMIN' && passwordInput === '123456') {
+                localStorage.setItem('isLoggedIn', 'true');
+                errorElement.style.display = 'none';
+                checkAuth();
+                document.getElementById('loginForm').reset();
+            } else {
+                errorElement.style.display = 'block';
+            }
         }
 
         // تسجيل الخروج
