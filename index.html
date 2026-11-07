@@ -759,6 +759,7 @@
         }
 
         // محرك فحص المنبهات والتذكير التلقائي
+         SDGSFGSDDV
         function checkAlarms() {
             const now = new Date();
             const currentHours = String(now.getHours()).padStart(2, '0');
@@ -770,7 +771,7 @@
             const currentDay = String(now.getDate()).padStart(2, '0');
             const currentDateStr = `${currentYear}-${currentMonth}-${currentDay}`;
 
-            // 1. فحص منبهات الأدوية
+            // 1. فحص منبهات الأدويةDDSV
             medicines.forEach(med => {
                 if (med.time === currentTimeStr && !med.triggered) {
                     triggerAlarm(`⏰ حان الآن موعد جرعة الدواء: (${med.name}) - الجرعة: [${med.dose}]`);
